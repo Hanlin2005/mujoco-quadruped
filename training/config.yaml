@@ -1,0 +1,93 @@
+# Quadruped Locomotion Training Configuration
+# =============================================
+
+# Environment settings
+env:
+  max_episode_steps: 1000
+  action_scale: 0.3
+  sim_steps_per_action: 10
+
+  # Reward weights
+  rewards:
+    ctrl_cost_weight: 0.01
+    alive_bonus: 1.0
+    velocity_tracking_weight: 2.0
+    fall_penalty: 5.0
+    smoothness_weight: 0.05
+    foot_slip_weight: 0.1
+    orientation_weight: 0.5
+    height_weight: 0.5
+
+  # Commanded velocity (Phase 2: fixed, Phase 4: randomized)
+  command:
+    vx: 1.0
+    vy: 0.0
+    yaw_rate: 0.0
+
+  # Domain randomization (enable in Phase 3+)
+  domain_randomize: false
+
+# PPO hyperparameters
+ppo:
+  learning_rate: 0.0003
+  n_steps: 2048
+  batch_size: 64
+  n_epochs: 10
+  gamma: 0.99
+  gae_lambda: 0.95
+  clip_range: 0.2
+  clip_range_vf: null
+  ent_coef: 0.01
+  vf_coef: 0.5
+  max_grad_norm: 0.5
+  normalize_advantage: true
+
+# Network architecture
+policy:
+  net_arch:
+    pi: [256, 256]
+    vf: [256, 256]
+  activation_fn: "elu"
+
+# Training settings
+training:
+  total_timesteps: 1_000_000
+  n_envs: 4
+  seed: 42
+  log_interval: 10
+  save_freq: 100_000        # Save checkpoint every N steps
+  eval_freq: 50_000         # Evaluate every N steps
+  n_eval_episodes: 10
+  video_freq: 200_000       # Record video every N steps
+  video_length: 500         # Steps per video
+
+# Curriculum learning (Phase 4)
+curriculum:
+  enabled: false
+  stages:
+    - name: "flat_basic"
+      terrain: "flat"
+      cmd_vx_range: [0.3, 0.6]
+      domain_randomize: false
+      timesteps: 1_000_000
+    - name: "flat_fast"
+      terrain: "flat"
+      cmd_vx_range: [0.5, 1.2]
+      domain_randomize: false
+      timesteps: 1_000_000
+    - name: "rough_terrain"
+      terrain: "rough"
+      cmd_vx_range: [0.3, 1.0]
+      domain_randomize: true
+      timesteps: 1_500_000
+    - name: "mixed_terrain"
+      terrain: "mixed"
+      cmd_vx_range: [0.3, 1.5]
+      domain_randomize: true
+      timesteps: 1_500_000
+
+# Paths
+paths:
+  model_dir: "trained_models"
+  log_dir: "logs"
+  video_dir: "videos"

@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Training outputs (large files)
+trained_models/*.zip
+trained_models/*.pkl
+logs/
+videos/*.mp4
+
+# Generated terrain files
+models/terrain_*.xml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Misc
+training_output.log
